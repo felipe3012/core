@@ -1,0 +1,5 @@
+@extends('layouts.error')
+@section('name','Error 500')
+@section('code','500')
+@section('title','INTERNAL SERVER ERROR.')
+@section('subtitle','Please try after some time')

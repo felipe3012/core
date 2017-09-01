@@ -1,0 +1,5 @@
+@extends('layouts.error')
+@section('name','Error 503')
+@section('code','503')
+@section('title','THIS SITE IS GETTING A UP IN FEW MINUTE.')
+@section('subtitle','Please try after some time')

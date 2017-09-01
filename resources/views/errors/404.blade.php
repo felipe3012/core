@@ -1,0 +1,5 @@
+@extends('layouts.error')
+@section('name','Error 404')
+@section('code','404')
+@section('title','PAGE NOT FOUND !')
+@section('subtitle','YOU SEEM TO BE TRYING TO FIND HIS WAY HOME')

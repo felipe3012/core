@@ -1,0 +1,5 @@
+@extends('layouts.error')
+@section('name','Error 403')
+@section('code','403')
+@section('title','FORBIDDEN ERROR')
+@section('subtitle','YOU DONT HAVE PERMISSION TO ACCESS ON THIS SERVER.')
