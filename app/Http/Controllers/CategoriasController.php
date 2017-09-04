@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Entidades;
 use App\Http\Controllers\Controller;
 use App\Itilcategories;
 use App\User;
@@ -10,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Session;
+use Auth;
 
 class CategoriasController extends Controller
 {
@@ -42,7 +42,7 @@ class CategoriasController extends Controller
     {
         //
         if ($this->security(28)) {
-            $categorias = Itilcategories::select('itilcategories.id', 'itilcategories.entities_id', 'itilcategories.itilcategories_id', 'itilcategories.name', 'itilcategories.completename', 'itilcategories.comment', 'itilcategories.level', 'users.realname', 'itilcategories.acuerdo')->join('users', 'users.id', '=', 'itilcategories.users_id')->get();
+            $categorias = Itilcategories::select('itilcategories.id', 'itilcategories.entities_id', 'itilcategories.itilcategories_id', 'itilcategories.name', 'itilcategories.completename', 'itilcategories.comment', 'itilcategories.level', 'users.realname', 'itilcategories.acuerdo')->join('users', 'users.id', '=', 'itilcategories.users_id')->whereRaw("itilcategories.entities_id IN (" . $this->getIdEntities() . ")")->get();
             return view('administracion.categorias.admin', compact('categorias'));}
     }
 
@@ -55,9 +55,9 @@ class CategoriasController extends Controller
     {
         //
         if ($this->security(29)) {
-            $entidad    = Entidades::all();
+            $entidad    = $this->getEntities();
             $tecnicos   = User::where('is_tecnico', 1)->lists('realname', 'id')->toArray();
-            $categorias = Itilcategories::all();
+            $categorias = Itilcategories::whereRaw("itilcategories.entities_id IN (" . $this->getIdEntities() . ")")->get();
             return view('administracion.categorias.new', compact('entidad', 'tecnicos', 'categorias'));
         }
     }
@@ -81,10 +81,10 @@ class CategoriasController extends Controller
             $request['level']        = $this->level($categories);
             $request['id']           = $u[0]->id + 1;
             if (User::create($request->all())) {
-                 $this->eventsStore('0', 'Categorias', 'nuevo', 'Categoria '.$request['nombre'].' creada por '.Auth::user()->username);
+                $this->eventsStore('0', 'Categorias', 'nuevo', 'Categoria ' . $request['nombre'] . ' creada por ' . Auth::user()->username);
                 Session::flash('message-success', 'categoria ' . $request['nombre'] . ' creado correctamente');
             } else {
-                $this->eventsStore('0', 'Categorias', 'nuevo', 'Erro al crear categoria '.$request['nombre'].' intentado por '.Auth::user()->username);
+                $this->eventsStore('0', 'Categorias', 'nuevo', 'Erro al crear categoria ' . $request['nombre'] . ' intentado por ' . Auth::user()->username);
                 Session::flash('message-error', 'Error al crear categoria' . $request['nombre']);
             }
             return $this->retorno("administracion_categorias");
@@ -144,7 +144,7 @@ class CategoriasController extends Controller
         //
         if ($this->security(30)) {
             $categoria  = $this->categoria;
-            $entidad    = Entidades::all();
+            $entidad    = $this->getEntities();
             $tecnicos   = User::where('is_tecnico', 1)->lists('realname', 'id')->toArray();
             $categorias = Itilcategories::all();
             return view('administracion.categorias.edit', compact('entidad', 'categorias', 'tecnicos', 'categoria'));
@@ -170,10 +170,10 @@ class CategoriasController extends Controller
             $request['level']        = $this->level($categories);
             $this->categoria->fill($request->all());
             if ($this->categoria->save()) {
-                 $this->eventsStore('0', 'Categorias', 'edicion', 'Categoria '.$request['name'].' editada por '.Auth::user()->username);
+                $this->eventsStore('0', 'Categorias', 'edicion', 'Categoria ' . $request['name'] . ' editada por ' . Auth::user()->username);
                 Session::flash('message-success', 'categoria ' . $request['nombre'] . ' actualizado correctamente');
             } else {
-                 $this->eventsStore('0', 'Categorias', 'edicion', 'Error al editar categoria '.$request['name'].' intentado por '.Auth::user()->username);
+                $this->eventsStore('0', 'Categorias', 'edicion', 'Error al editar categoria ' . $request['name'] . ' intentado por ' . Auth::user()->username);
                 Session::flash('message-error', 'Error al actualizar categoria' . $request['nombre']);
             }
 

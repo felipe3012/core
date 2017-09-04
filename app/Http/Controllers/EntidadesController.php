@@ -43,7 +43,7 @@ class EntidadesController extends Controller
     {
         //
         if ($this->security(23)) {
-            $entidades = Entidades::all();
+            $entidades = $this->getEntities();
             return view('administracion.entidades.admin', compact('entidades'));
         }
     }
@@ -57,7 +57,7 @@ class EntidadesController extends Controller
     {
         //
         if ($this->security(24)) {
-            $entidades     = Entidades::all();
+            $entidades     = $this->getEntities();
             $departamentos = Departamentos::lists('descripcion', 'id')->toArray();
             $municipios    = Municipios::lists('descripcion', 'id')->toArray();
             return view('administracion.entidades.new', compact('entidades', 'departamentos', 'municipios'));
@@ -160,7 +160,7 @@ class EntidadesController extends Controller
             $entidad       = $this->entidades;
             $departamentos = Departamentos::lists('descripcion', 'id')->toArray();
             $municipios    = Municipios::where('id_departamento', $entidad->state)->lists('descripcion', 'id')->toArray();
-            $entidades     = Entidades::all();
+            $entidades     = $this->getEntities();
             return view('administracion.entidades.edit', compact('entidad', 'entidades', 'departamentos', 'municipios'));
         }
     }
@@ -253,32 +253,5 @@ class EntidadesController extends Controller
         return $this->retorno("");
     }
 
-/**
- * [build_raiz description]
- * @param  [type] $entidades [description]
- * @return [type]            [description]
- */
-    public function build_raiz($entidades)
-    {
-        $entidad = [];
-        $content = [];
-        $raiz    = '';
-        $ent     = Auth::user()->entities_id;
-        $in      = $this->recursivo($ent);
-        $aux     = substr($ent . "," . $in, 0, -1);
-        $raizes  = Entidades::whereRaw('id IN (' . $aux . ')')->orderBy('entities_id', 'ASC')->get();
-        foreach ($raizes as $value) {
-            $subraiz = $value->entities_id;
-            array_push($content, $value->id);
-            $boolean = "false";
-            if (in_array($value->id, $entidad)) {
-                $boolean = "true";
-            }
-            if ($subraiz < 0 || !in_array($subraiz, $content)) {
-                $subraiz = '#';
-            }
-            $raiz .= '{ "id" : "' . $value->id . '", "parent" : "' . $subraiz . '", "text" : "' . $value->name . '", "state": {"selected": ' . $boolean . '}},';
-        }
-        return $raiz;
-    }
+
 }

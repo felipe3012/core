@@ -6,16 +6,16 @@ use App\Documentos;
 use App\Entidades;
 use App\Http\Controllers\Controller;
 use App\Itilcategories;
+use App\Logs;
 use App\Ticketfollowups;
 use App\Tickets;
 use App\User;
+use Auth;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Session;
-use App\Logs;
-use Auth;
 
 class IncidenciasController extends Controller
 {
@@ -39,9 +39,9 @@ class IncidenciasController extends Controller
         $this->notFound($this->incidencias);
     }
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * [index description]
+     * @param  Request $request [description]
+     * @return [type]           [description]
      */
     public function index(Request $request)
     {
@@ -63,15 +63,13 @@ class IncidenciasController extends Controller
             Session::forget('campo', 'parametro', 'parametro');
         }
 
-        $entidades  = Entidades::lists('completename', 'id')->toArray();
-        $categorias = Itilcategories::lists('completename', 'id')->toArray();
-
+        $entidades   = Entidades::lists('completename', 'id')->toArray();
+        $categorias  = Itilcategories::lists('completename', 'id')->toArray();
         $incidencias = Tickets::select('e.name as entidad', 'tickets.id', 'tickets.name', 'tickets.content', 'tickets.solution', 'tickets.closedate', 'tickets.created_at', 'a.firstname as a', 'a.realname as aa', 'b.firstname as b', 'b.realname as bb', 't.completename', 'e.completename as entidad', 'tickets.status')
             ->leftjoin('entities as e', 'e.id', '=', 'tickets.entities_id')
             ->leftjoin('users as a', 'a.id', '=', 'tickets.users_id_recipient')
             ->leftjoin('itilcategories as t', 't.id', '=', 'tickets.itilcategories_id')
             ->leftjoin('users as b', 'b.id', '=', 't.users_id')->consulta($sql)->orderBy('tickets.id', 'desc')->paginate($paginate);
-
         return view('incidencias.admin', compact('incidencias', 'entidades', 'categorias'));
     }
 
@@ -85,7 +83,7 @@ class IncidenciasController extends Controller
         //
         $categorias = Itilcategories::all();
         $usuarios   = User::where('is_tecnico', 1)->lists('realname', 'id')->toArray();
-        $entidad    = Entidades::all();
+        $entidad    = $this->getEntities();
         return view('incidencias.new', compact('categorias', 'usuarios', 'entidad'));
     }
 
@@ -98,13 +96,13 @@ class IncidenciasController extends Controller
     public function store(Request $request)
     {
         //
-          $request['status'] = 1;
-        $incidencias = Tickets::create($request->all());
+        $request['status'] = 1;
+        $incidencias       = Tickets::create($request->all());
         if ($incidencias) {
-             $this->eventsStore($incidencias->id, 'Incidencia', 'nuevo', 'Incidencia '.$incidencias->id.' creada por '.Auth::user()->username);
+            $this->eventsStore($incidencias->id, 'Incidencia', 'nuevo', 'Incidencia ' . $incidencias->id . ' creada por ' . Auth::user()->username);
             Session::flash('message-success', 'Incidencia ' . $request['nombre'] . ' creado correctamente');
         } else {
-             $this->eventsStore('0', 'Incidencia', 'nuevo', 'Error al crear incidencia '.$request['name'].' intentada por '.Auth::user()->username);
+            $this->eventsStore('0', 'Incidencia', 'nuevo', 'Error al crear incidencia ' . $request['name'] . ' intentada por ' . Auth::user()->username);
             Session::flash('message-error', 'Error al crear incidencia' . $request['nombre']);
         }
         return $this->retorno("incidencias");
@@ -166,10 +164,10 @@ class IncidenciasController extends Controller
         $documentos   = Documentos::select('documents.id', 'documents.filename', 'documents.filepath', 'documents.created_at', 'users.realname as user_id', 'firstname')->leftjoin('users', 'users.id', '=', 'documents.users_id')->where('tickets_id', $incidencia->id)->get();
         $categorias   = Itilcategories::all();
         $usuarios     = User::where('is_tecnico', 1)->lists('realname', 'id')->toArray();
-        $entidad      = Entidades::all();
+        $entidad      = $this->getEntities();
         $logs         = Logs::where('items_id', $incidencia->id)->Get();
         $seguimientos = Ticketfollowups::select('content', 'realname as user_id', 'ticketfollowups.created_at')->where('tickets_id', $id)->join('users', 'users.id', '=', 'ticketfollowups.users_id')->orderBy('ticketfollowups.id', 'created_at')->get();
-        return view('incidencias.edit', compact('categorias', 'incidencia', 'usuarios', 'entidad', 'seguimientos', 'documentos','logs'));
+        return view('incidencias.edit', compact('categorias', 'incidencia', 'usuarios', 'entidad', 'seguimientos', 'documentos', 'logs'));
     }
 
 /**
@@ -184,10 +182,10 @@ class IncidenciasController extends Controller
         //
         $this->incidencias->fill($request->all());
         if ($this->incidencias->save()) {
-             $this->eventsStore($id, 'Incidencia', 'edicion', 'Incidencia '.$request['ticket'].' editada por '.Auth::user()->username);
+            $this->eventsStore($id, 'Incidencia', 'edicion', 'Incidencia ' . $request['ticket'] . ' editada por ' . Auth::user()->username);
             Session::flash('message-success', 'Incidencia ' . $request['nombre'] . ' actualizado correctamente');
         } else {
-            $this->eventsStore($id, 'Incidencia', 'edicion', 'Error al editar incidencia '.$request['ticket'].' intentado por '.Auth::user()->username);
+            $this->eventsStore($id, 'Incidencia', 'edicion', 'Error al editar incidencia ' . $request['ticket'] . ' intentado por ' . Auth::user()->username);
             Session::flash('message-error', 'Error al actualizar incidencia' . $request['nombre']);
         }
         return $this->retorno("incidencias");
@@ -286,4 +284,6 @@ class IncidenciasController extends Controller
             }
         }
     }
+
+
 }

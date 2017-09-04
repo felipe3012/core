@@ -74,7 +74,7 @@ CanResetPasswordContract
     public function entidad()
     {
         $nombre = "";
-        $entity = User::select('entities_id', 'entities_select')->where('id', $this->attributes['id'])->get();
+        $entity = User::select('entities_id', 'entities_select')->where('id', Auth::user()->id)->get();
         if (count($entity) > 0) {
             if (!empty($entity[0]->entities_select)) {
                 $id = $entity[0]->entities_select;

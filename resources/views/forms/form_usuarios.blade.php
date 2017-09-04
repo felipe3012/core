@@ -1,3 +1,4 @@
+{!! Form::hidden('entities_select', null, []) !!}
 <div class="col-md-6">
 <div class="item form-group">
   <div class="col-md-2 col-sm-2 col-xs-12">
@@ -161,9 +162,11 @@
      </div>
     <div class="col-md-10 col-sm-10 col-xs-12">
       <select id="recursives" name="entities_id">
+    <?php $i = 0;?>
           @foreach($entidad as $option)
-            <option value="{{$option->id}}"  @if(($option->entities_id)>-1) data-parent="{{$option->entities_id}}" @endif
+            <option value="{{$option->id}}"  @if($i!=0) data-parent="{{$option->entities_id}}" @endif
             @if(isset($usuario))  @if($usuario->entities_id == $option->id ) selected @endif  @endif>{{$option->name}}</option>
+             <?php $i++;?>
             @endforeach
         </select>
         <div class="help-block with-errors">

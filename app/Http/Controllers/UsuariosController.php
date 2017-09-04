@@ -47,7 +47,8 @@ class UsuariosController extends Controller
     {
         //
         if ($this->security(8)) {
-            $usuarios = User::select('users.id', 'users.email', 'users.username', 'profiles.name as perfil', 'users.is_active', 'users.realname', 'users.firstname')->join('profiles', 'profiles.id', '=', 'users.profiles_id')->get();
+            $entidad = substr($this->recursivo(Auth::user()->entities_id),0,-1);
+            $usuarios = User::select('users.id', 'users.email', 'users.username', 'profiles.name as perfil', 'users.is_active', 'users.realname', 'users.firstname')->join('profiles', 'profiles.id', '=', 'users.profiles_id')->whereRaw("entities_id IN (".$entidad.")")->get();
             return view('administracion.usuarios.admin', compact('usuarios'));
         }
     }

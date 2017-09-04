@@ -107,29 +107,6 @@ class ReportesController extends Controller
         //
     }
 
-    /**
-     * [build_raiz description]
-     * @param  [type] $entidades [description]
-     * @return [type]            [description]
-     */
-    public function build_raiz($entidades)
-    {
-        $entidad = [];
-        $raiz    = '';
-        $raizes  = Entidades::all();
-
-        foreach ($raizes as $value) {
-            $subraiz = $value->entities_id;
-            $boolean = "false";
-            if (in_array($value->id, $entidad)) {
-                $boolean = "true";
-            }
-            if ($subraiz < 0) {
-                $subraiz = '#';
-            }
-            $raiz .= '{ "id" : "' . $value->id . '", "parent" : "' . $subraiz . '", "text" : "' . $value->name . '", "state": {"selected": ' . $boolean . '}},';
-        }
-        return $raiz;
-    }
+   
 
 }

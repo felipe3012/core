@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Entidades;
+use App\Events;
 use Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Events;
 
 abstract class Controller extends BaseController
 {
@@ -54,11 +54,38 @@ abstract class Controller extends BaseController
         echo $script;
     }
 
+    /**
+     * Metodo guardar en logs
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function eventsStore($items_id, $type, $service, $message)
+    {
+        $evento = Events::create(['items_id' => $items_id, 'type' => $type, 'service' => $service, 'message' => $message]);
+    }
+
 /**
- * [recursivo description]
- * @param  [type] $id [description]
- * @return [type]     [description]
+ * [getRealIP description]
+ * @return [type] [description]
  */
+    public function getRealIP()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            return $_SERVER['HTTP_CLIENT_IP'];
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+
+        return $_SERVER['REMOTE_ADDR'];
+    }
+
+    /**
+     * [recursivo description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
     public function recursivo($id)
     {
         $aux   = "";
@@ -76,25 +103,50 @@ abstract class Controller extends BaseController
         return $aux;
     }
 
-
-     /**
-     * Metodo guardar en logs
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function eventsStore($items_id, $type , $service, $message)
+/**
+ * [getIdEntities description]
+ * @return [type] [description]
+ */
+    public function getIdEntities()
     {
-        $evento = Events::create(['items_id' => $items_id, 'type' => $type, 'service' => $service, 'message' => $message]);
+        $entidad = Auth::user()->entities_id . "," . substr($this->recursivo(Auth::user()->entities_id), 0, -1);
+        return $entidad;
     }
 
-    function getRealIP() {
+/**
+ * [getEntities description]
+ * @return [type] [description]
+ */
+    public function getEntities()
+    {
+        $aux    = $this->getIdEntities();
+        $raizes = Entidades::whereRaw('id IN (' . $aux . ')')->orderBy('entities_id', 'ASC')->get();
+        return $raizes;
+    }
 
-        if (!empty($_SERVER['HTTP_CLIENT_IP']))
-            return $_SERVER['HTTP_CLIENT_IP'];
-           
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-            return $_SERVER['HTTP_X_FORWARDED_FOR'];
-       
-        return $_SERVER['REMOTE_ADDR'];
+    /**
+     * [build_raiz description]
+     * @param  [type] $entidades [description]
+     * @return [type]            [description]
+     */
+    public function build_raiz($entidades)
+    {
+        $entidad = [];
+        $content = [];
+        $raiz    = '';
+        $raizes  = $this->getEntities();
+        foreach ($raizes as $value) {
+            $subraiz = $value->entities_id;
+            array_push($content, $value->id);
+            $boolean = "false";
+            if (in_array($value->id, $entidad)) {
+                $boolean = "true";
+            }
+            if ($subraiz < 0 || !in_array($subraiz, $content)) {
+                $subraiz = '#';
+            }
+            $raiz .= '{ "id" : "' . $value->id . '", "parent" : "' . $subraiz . '", "text" : "' . $value->name . '", "state": {"selected": ' . $boolean . '}},';
+        }
+        return $raiz;
     }
 }
