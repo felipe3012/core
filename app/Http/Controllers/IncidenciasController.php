@@ -73,7 +73,7 @@ class IncidenciasController extends Controller
         return view('incidencias.admin', compact('incidencias', 'entidades', 'categorias'));
     }
 
-/**
+/** 
  * Show the form for creating a new resource.
  *
  * @return \Illuminate\Http\Response
@@ -81,10 +81,13 @@ class IncidenciasController extends Controller
     public function create()
     {
         //
+        if($this->security(2));
         $categorias = Itilcategories::all();
         $usuarios   = User::where('is_tecnico', 1)->lists('realname', 'id')->toArray();
         $entidad    = $this->getEntities();
         return view('incidencias.new', compact('categorias', 'usuarios', 'entidad'));
+        
+
     }
 
 /**
@@ -96,6 +99,7 @@ class IncidenciasController extends Controller
     public function store(Request $request)
     {
         //
+        if($this->security(2));
         $request['status'] = 1;
         $incidencias       = Tickets::create($request->all());
         if ($incidencias) {
@@ -159,7 +163,8 @@ class IncidenciasController extends Controller
  */
     public function edit($id)
     {
-        //
+        // 
+        if($this->security(3));
         $incidencia   = $this->incidencias;
         $documentos   = Documentos::select('documents.id', 'documents.filename', 'documents.filepath', 'documents.created_at', 'users.realname as user_id', 'firstname')->leftjoin('users', 'users.id', '=', 'documents.users_id')->where('tickets_id', $incidencia->id)->get();
         $categorias   = Itilcategories::all();
@@ -180,6 +185,8 @@ class IncidenciasController extends Controller
     public function update(Request $request, $id)
     {
         //
+        if($this->security(3));
+        
         $this->incidencias->fill($request->all());
         if ($this->incidencias->save()) {
             $this->eventsStore($id, 'Incidencia', 'edicion', 'Incidencia ' . $request['ticket'] . ' editada por ' . Auth::user()->username);
@@ -215,6 +222,7 @@ class IncidenciasController extends Controller
  */
     public function seguimiento($id)
     {
+        if($this->security(3));
         $seguimientos = Ticketfollowups::select('content', 'realname as user_id', 'ticketfollowups.created_at')->where('tickets_id', $id)->join('users', 'users.id', '=', 'ticketfollowups.users_id')->orderBy('ticketfollowups.id', 'created_at')->get();
         return view('incidencias.seguimiento', compact('seguimientos'));
     }

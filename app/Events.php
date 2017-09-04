@@ -24,5 +24,5 @@ class Events extends Model
      *
      * @var array
      */
-    protected $fillable = ['id', 'items_id', 'type', 'date', 'service', 'level', 'message'];
+    protected $fillable = ['id', 'items_id', 'type', 'created_at', 'service', 'level', 'message'];
 }

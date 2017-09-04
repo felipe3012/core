@@ -8,7 +8,7 @@
 | Here is where you can register all of the routes for an application.
 | It's a breeze. Simply tell Laravel the URIs it should respond to
 | and give it the controller to call when that URI is requested.
-|
+| 
  */
 //---Raiz----//
 Route::resource('/', 'HomeController');
@@ -21,7 +21,7 @@ Route::get('inicio', 'IncidenciasController@index');
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', ['as' => 'auth/login', 'uses' => 'Auth\AuthController@postLogin']);
 Route::get('auth/logout', ['as' => 'auth/logout', 'uses' => 'Auth\AuthController@getLogout']);
-
+ 
 // Recuperar contraseña via mail
 Route::post('password/email', 'Auth\PasswordController@postEmail');
 Route::get('password/reset/{token}', 'Auth\PasswordController@getReset');
@@ -96,6 +96,9 @@ Route::get('mantenimiento/{id}', 'MantenimientosController@destroy')->name('mant
 
 // Logs
 Route::resource('configuracion_logs', 'LogsController');
+Route::get('logs/registros/{id}', 'LogsController@show')->name('logs/registros');
+Route::get('logs/paginador/{id}', 'LogsController@paginador')->name('logs/paginador');
+
 
 // General
 Route::resource('configuracion_general', 'GeneralController');

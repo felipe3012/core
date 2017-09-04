@@ -36,6 +36,7 @@ class GeneralController extends Controller
     public function index()
     {
         //
+        if ($this->security(33));
         $configuraciones = [];//configuraciones::all();
         return view('configuracion.general.admin', compact('configuraciones'));
     }

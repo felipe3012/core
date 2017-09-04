@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Logs;
+use App\Events; 
+use Session;
+use Illuminate\Http\Request;
 
 class LogsController extends Controller
 {
@@ -33,11 +36,44 @@ class LogsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
+    { 
+        if ($this->security(34));
+        //
+        $paginate = "5";
+
+        if (Session::has('page')) {
+            $request['page'] = Session::get('page');
+            Session::forget('page');
+        }
+ 
+        $logs = Events::select('id','items_id','type','created_at','service','level', 'message')->paginate($paginate);
+        return view('configuracion.logs.admin', compact('logs'));
+    }
+
+    /**
+ * Display the specified resource.
+ *
+ * @param  int  $id
+ * @return \Illuminate\Http\Response
+ */
+    public function show($id)
+    {
+        // 
+        Session::put('paginate', $id);
+        return redirect('configuracion_logs');
+    }
+ 
+        /**
+     * Metodo para realizar paginación
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function paginador($id)
     {
         //
-        $logs = []; // Logs::all();
-        return view('configuracion.logs.admin', compact('logs'));
+        Session::put('page', $id);
+        return redirect('configuracion_logs');
     }
 
 }

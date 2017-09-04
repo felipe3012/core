@@ -19,6 +19,7 @@ class ReportesController extends Controller
     public function index()
     {
         //
+        if ($this->security(5)); 
         return view('reportes.admin');
     }
 

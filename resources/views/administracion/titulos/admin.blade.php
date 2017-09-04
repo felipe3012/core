@@ -13,7 +13,7 @@
             </div> </h3>
              <table class="table table-striped table-hover table-bordered center datatable">
             <thead>
-                <tr>
+                <tr> 
                     <th>Nombre</th>
                     <th>Acciones</th>
                 </tr>

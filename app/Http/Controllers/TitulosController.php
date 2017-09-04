@@ -37,7 +37,7 @@ class TitulosController extends Controller
      */
     public function index()
     {
-        //
+        // 
         if ($this->security(13)) {
             $titulos = Cargos::all();
             return view('administracion.titulos.admin', compact('titulos'));}

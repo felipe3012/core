@@ -1,5 +1,5 @@
 <?php
-
+ 
 namespace App\Http\Controllers;
 
 use App\Departamentos;
@@ -201,7 +201,7 @@ class EntidadesController extends Controller
     public function destroy($id, $nombre)
     {
         //
-        if ($this->security(25)) {
+        if ($this->security(26)) {
             if (Entidades::destroy($id)) {
                 $this->eventsStore('0', 'Entidad', 'elimiar', 'Entidad '.$request['name'].' eliminada por '.Auth::user()->username);
                 Session::flash('message-success', 'Entidad ' . $nombre . ' eliminada correctamente');

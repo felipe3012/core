@@ -5,7 +5,7 @@
 @section('content')
   <div class="row">
         <div class="col-md-12">
-          <div class="white-box">
+          <div class="white-box"> 
             <h3 class="box-title">Listado de usuarios <div class="box-tools pull-right form-inline hidden-xs">
               @if(in_array(9, Auth::user()->permisos()))
             {!!Html::decode(link_to_route('administracion_usuarios.create','<button type="button" class="btn btn-sm btn-warning "><i class="fa fa-plus"></i> Nuevo</button>',[],['class'=>'','title'=>'Nuevo usuario','data-icon'=>'fa fa-plus']))!!}

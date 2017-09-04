@@ -3,36 +3,43 @@
 @section('name',' <i class="fa fa-users"></i> Logs')
 @section('breadcrumb','<li>Configuración</li><li>logs</li><li class="active">Administrar</li>')
 @section('content')
-  <div class="row">
+
+<div class="row">
         <div class="col-md-12">
           <div class="white-box">
-            <h3 class="box-title">Listado de logs <div class="box-tools pull-right form-inline hidden-xs">
-            
-            </div> </h3>
-             <table class="table table-striped table-hover table-bordered center datatable">
+            <h3 class="box-title "><?php $show = true; $data = 'logs'; $paginate   = $logs;?> 
+            @include('inc.paginate')
+            </h3>
+            <table class="tablesaw table table-striped table-condensed table-responsive table-hover table-bordered center"  data-tablesaw-mode="swipe">
             <thead>
                 <tr>
-                    <th>Evento</th>
-                    <th>Usuario</th>
-                    <th>Fecha</th>
-                    <th>Objeto</th>
-                    <th>Objeto actualizado</th>
-                    <th>Acciones</th>
-                </tr>
+                    <th style="text-align: center;">Id Ticket</th>
+                    <th style="text-align: center;">Tipo de Evento</th>
+                    <th style="text-align: center;">Servicio</th>
+                    <th style="text-align: center;">Fecha Creado</th>
+                    <th style="text-align: center;">Mensaje</th>
+                </tr> 
             </thead>
             <tbody>
             @foreach($logs as $data)
                 <tr>
-                    <td>{{$data->nombre}}</td>
-                    <td>{{$data->nombre}}</td>
-                     <td>{{$data->nombre}}</td>
-                    <td>{{$data->nombre}}</td>
-                     <td>{{$data->nombre}}</td>
+                    <td>{{$data->items_id}}</td>
+                    <td>{{$data->type}}</td>
+                    <td>{{$data->service}}</td>
+                    <td>{{$data->created_at}}</td>
+                    <td>{{$data->message}}</td>
                 </tr>
-                @endforeach
+            @endforeach
             </tbody>
-            </table>
-          </div>        
+            </table> 
+            <div>
+            <?php $show = false;?>
+                @include('inc.paginate')
+                <br/>
+                 <br/>
+            </div>
+          </div>
         </div>
       </div>
+
 @stop
